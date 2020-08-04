@@ -53,7 +53,11 @@ export class TokenNetworkService {
         return await this.channelClosedModel.find({ address: contract }).exec()
     }
 
-    async getParticipantOverview(contract: string) {
+    async getParticipantOverview() {
+        return await this.participantRepository.getParticipantOverviewOf(null)
+    }
+
+    async getParticipantOverviewOf(contract: string) {
         return await this.participantRepository.getParticipantOverviewOf(contract)
     }
 
@@ -95,7 +99,11 @@ export class TokenNetworkService {
         return { openedChannel: opened, closedChannel: closed }
     }
 
+    async getChannelsOverview() {
+        return await this.tokenNetworkOverviewModel.find().exec()
+    }
+
     async getChannelsOverviewOf(contract: string) {
-        return await this.tokenNetworkOverviewModel.find({ tokenNetwork: contract }).exec()
+        return await this.tokenNetworkOverviewModel.find({ tokenNetwork: contract ? contract : { $regex: /.*/ } }).exec()
     }
 }

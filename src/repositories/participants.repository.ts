@@ -17,7 +17,7 @@ export class ParticipantRepository {
         const participant1 = await this.channelOpenedModel
             .aggregate([
 
-                { $match: { address: contract } },
+                { $match: { address: contract ? contract : { $regex: /.*/ } } },
                 {
                     $group: {
                         _id: { participant: "$returnValues.participant1" },
@@ -32,7 +32,7 @@ export class ParticipantRepository {
         const participant2 = await this.channelOpenedModel
             .aggregate([
 
-                { $match: { address: contract } },
+                { $match: { address: contract ? contract : { $regex: /.*/ } } },
                 {
                     $group: {
                         _id: { participant: "$returnValues.participant2" },
@@ -49,9 +49,11 @@ export class ParticipantRepository {
             if (tmp) {
                 participant.count += tmp.count
                 participant.channel_identifiers = participant.channel_identifiers.concat(tmp.channel_identifiers)
+                participant2.splice(participant2.indexOf(tmp), 1)
             }
         })
-        return participant1
+
+        return participant1.concat(participant2)
     }
 
 }

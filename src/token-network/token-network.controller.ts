@@ -36,9 +36,19 @@ export class TokenNetworkController {
         return this.tokenNetworkService.getChannelsTimelineOf(params.contract)
     }
 
+    @Get('participant-overview')
+    getParticipantOverview() {
+        return this.tokenNetworkService.getParticipantOverview()
+    }
+
     @Get('participant-overview/:contract')
-    getParticipantOverview(@Param() params) {
-        return this.tokenNetworkService.getParticipantOverview(params.contract)
+    getParticipantOverviewOf(@Param() params) {
+        return this.tokenNetworkService.getParticipantOverviewOf(params.contract)
+    }
+
+    @Get('channel-overview')
+    getChannelOverview() {
+        return this.tokenNetworkService.getChannelsOverview()
     }
 
     @Get('channel-overview/:contract')
