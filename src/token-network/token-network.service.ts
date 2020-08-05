@@ -14,6 +14,8 @@ import { ChannelOpenedRepository } from 'src/repositories/channel-opened.reposit
 import { ChannelClosedRepository } from 'src/repositories/channel-closed.repository';
 import { ParticipantRepository } from 'src/repositories/participants.repository';
 import { TokenNetworkOverview } from 'src/models/token-network-overview.model';
+import { ChannelTimelineOverview } from 'src/models/channel-timeline-overview.model';
+import { TokenNetworkOverviewDto } from 'src/models/dto/token-network-overview.dto';
 
 @Injectable()
 export class TokenNetworkService {
@@ -28,6 +30,7 @@ export class TokenNetworkService {
         @InjectModel(ChannelWithdraw.name) private readonly channelWithdrawModel: Model<ChannelWithdraw>,
         @InjectModel(NonClosingBalanceProofUpdated.name) private readonly nonClosingBalanceProofUpdatedModel: Model<NonClosingBalanceProofUpdated>,
         @InjectModel(TokenNetworkOverview.name) private readonly tokenNetworkOverviewModel: Model<TokenNetworkOverview>,
+        @InjectModel(ChannelTimelineOverview.name) private readonly channelTimelineOverviewModel: Model<ChannelTimelineOverview>,
         private readonly channelOpenedRepository: ChannelOpenedRepository,
         private readonly channelClosedRepository: ChannelClosedRepository,
         private readonly participantRepository: ParticipantRepository,
@@ -62,45 +65,27 @@ export class TokenNetworkService {
     }
 
     async getChannelsTimelineOf(contract: string) {
-        const channelsOpened: ChannelOpenedStatus[] = await this.channelOpenedRepository.getOpenedChannelTimelineOverviewOf(contract)
-        const channelsClosed: ChannelClosedStatus[] = await this.channelClosedRepository.getClosedChannelTimelineOverviewOf(contract)
-
-
-        let res: ChannelEventStatus[] = channelsOpened.concat(channelsClosed).sort((a, b) => a.blockTimestamp - b.blockTimestamp)
-
-        let closedCount = 0
-        res.map((event: any) => {
-            if (event.closed_channels_sum) closedCount += (event.closed_channels_sum - closedCount)
-            else event.opened_channels_sum -= closedCount
-        })
-
-        return this.fillMissingEvent(res)
-    }
-
-    private fillMissingEvent(res: any[]): { openedChannel: ChannelOpenedStatus[], closedChannel: ChannelClosedStatus[] } {
-        let opened: ChannelOpenedStatus[] = []
-        let closed: ChannelClosedStatus[] = []
-        let lastOpened = 0
-        let lastClosed = 0
-
-        res.forEach(ev => {
-            if (ev.opened_channels_sum) {
-                opened.push(ev)
-                closed.push({ blockTimestamp: ev.blockTimestamp, closed_channels_sum: lastClosed })
-                lastOpened = ev.opened_channels_sum
-            } else {
-                opened.push({ blockTimestamp: ev.blockTimestamp, opened_channels_sum: lastOpened - (ev.closed_channels_sum - lastClosed) })
-                closed.push(ev)
-                lastOpened -= (ev.closed_channels_sum - lastClosed)
-                lastClosed = ev.closed_channels_sum
-            }
-        })
-
-        return { openedChannel: opened, closedChannel: closed }
+        return await this.channelTimelineOverviewModel.findOne({ tokenNetwork: contract }).exec()
     }
 
     async getChannelsOverview() {
-        return await this.tokenNetworkOverviewModel.find().exec()
+        let totalOverview: TokenNetworkOverviewDto = {
+            channelClosed: 0,
+            channelOpened: 0,
+            channelSettled: 0,
+            withdrawCount: 0,
+            depositCount: 0,
+        }
+        const tokenNetworkOverview: TokenNetworkOverview[] = await this.tokenNetworkOverviewModel.find().exec()
+        tokenNetworkOverview.forEach(tko => {
+            totalOverview.channelClosed += tko.channelClosed
+            totalOverview.channelOpened += tko.channelOpened
+            totalOverview.channelSettled += tko.channelSettled
+            totalOverview.withdrawCount += tko.withdrawCount
+            totalOverview.depositCount += tko.depositCount
+        })
+
+        return totalOverview
     }
 
     async getChannelsOverviewOf(contract: string) {

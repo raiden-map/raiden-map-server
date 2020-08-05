@@ -14,6 +14,7 @@ import { ChannelOpenedRepository } from 'src/repositories/channel-opened.reposit
 import { ChannelClosedRepository } from 'src/repositories/channel-closed.repository';
 import { ParticipantRepository } from 'src/repositories/participants.repository';
 import { TokenNetworkOverview, TokenNetworkOverviewSchema } from 'src/models/token-network-overview.model';
+import { ChannelTimelineOverview, ChannelTimelineOverviewSchema } from 'src/models/channel-timeline-overview.model';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { TokenNetworkOverview, TokenNetworkOverviewSchema } from 'src/models/tok
       { name: TokenNetworkCreated.name, schema: TokenNetworkCreatedSchema },
       { name: TokenInfo.name, schema: TokenInfoSchema },
       { name: TokenNetworkOverview.name, schema: TokenNetworkOverviewSchema },
+      { name: ChannelTimelineOverview.name, schema: ChannelTimelineOverviewSchema },
     ])
   ],
   controllers: [TokenNetworkController],
