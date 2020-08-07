@@ -36,8 +36,8 @@ export class TokenNetworkService {
         private readonly participantRepository: ParticipantRepository,
     ) { }
 
-    getTokenInfoOf(contract: string) {
-        throw new Error("Method not implemented.");
+    async getTokenInfoOf(_id: string) {
+        return await this.tokenInfoModel.findById({ _id: _id }).exec()
     }
 
     async getAllTokenInfo() {

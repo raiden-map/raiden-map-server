@@ -16,9 +16,9 @@ export class TokenNetworkController {
         return this.tokenNetworkService.getAllTokenInfo()
     }
 
-    @Get('info/:contract')
+    @Get('info/:_id')
     getTokenInfoOf(@Param() params) {
-        return this.tokenNetworkService.getTokenInfoOf(params.contract)
+        return this.tokenNetworkService.getTokenInfoOf(params._id)
     }
 
     @Get('channel-opened/:contract')

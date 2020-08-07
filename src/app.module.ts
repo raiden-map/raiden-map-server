@@ -9,7 +9,7 @@ const mongodb = 'mongodb://51.136.5.3:27017/raiden-map'
 
 @Module({
   imports: [
-    MongooseModule.forRoot(mongodb, {useFindAndModify: false}),
+    MongooseModule.forRoot(mongodb, { useFindAndModify: false}),
     TokenNetworkModule,
   ],
   controllers: [AppController],
